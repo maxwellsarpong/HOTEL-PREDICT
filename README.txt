@@ -1,6 +1,6 @@
 ----Overview of the DATASET------
 
-This file contains a dataset in csv called downloaded from the kaggle.com competition. 
+This file contains a dataset in csv called hotel_bookings downloaded from the kaggle.com competition. 
 The task involved in this competition was to predict the whether or not bookings to a room
 was either cancelled or not.
 
