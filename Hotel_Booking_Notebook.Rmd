@@ -1,0 +1,108 @@
+---
+author: MAXWELL SARPONG
+title: "hotel bookings"
+output: html_notebook
+---
+
+#-------- importing the datasets --------------------------------
+
+```{r}
+hotel <- read.csv("C:/Users/Big-Max/Downloads/hotel-booking-demand/hotel_bookings.csv")
+```
+
+
+# -------- glimpse of the data ----------------------------------
+```{r}
+head(hotel)
+```
+
+
+#--------- data types of the data -------------------------------
+```{r}
+sapply(hotel, class)
+```
+
+#--------- types of the hotel -------------------------
+```{r}
+summary(hotel$hotel)
+```
+
+#------- plotting the types of the hotel ----------------------
+```{r}
+library(ggplot2)
+ggplot(data = hotel, aes(x = hotel, y= "count")) +
+  geom_bar( stat="identity")+
+  guides(fill = FALSE)
+```
+
+#--------- list of countries involved in the hotel -------------------------------------
+```{r}
+levels(hotel$country)
+```
+
+#------------- selecting the countries ----------------------------------
+```{r}
+library(sqldf)
+country <- sqldf("select country from hotel")
+country<- data.frame(country)
+```
+
+# ------------ plotting of the countries ---------------------------------
+```{r}
+library(rworldmap)
+newmap <- getMap(resolution = "low")
+plot(newmap, xlim = c(-20, 59), ylim = c(35,71), asp=1)
+points(country, col = "blue", cex= .9)
+```
+
+#------------ arrival_date_month_to_the_hotel ------------------------------
+```{r}
+ggplot(data = hotel, aes(x = arrival_date_month, y= "count")) +
+   geom_bar( stat="identity")
+   
+```
+
+
+#--------- splitting the data ----------------------------------
+```{r}
+library(rsample)
+split<- initial_split(hotel, prop = .7)
+train <- training(split)
+test <- testing(split)
+```
+
+#-------- create models ----------------------------------
+```{r}
+library(rpart)
+model <- rpart(is_canceled~ ., data = train)
+```
+
+#------------- predict ----------------------------------
+```{r}
+pred <- predict(model, test, type="vector")
+```
+
+#------------- confusion matrix to proof model -------------------
+```{r}
+table(test$is_canceled, pred)
+```
+
+#------------ plotting the final bookings ----------------------
+```{r}
+library(ggplot2)
+ggplot(data = train, aes(x = is_canceled, y= "count", fill= is_canceled)) +
+  geom_bar( stat="identity")+
+  guides(fill = FALSE)
+  
+```
+
+
+# -------------- joining predicted values and hotel names ----------------
+```{r}
+names <- data.frame(pred, test$hotel)
+```
+
+# -------- final predictions -------------------------------------
+```{r}
+names
+```
